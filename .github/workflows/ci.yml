@@ -19,7 +19,7 @@ jobs:
     outputs:
       workspaces: ${{ steps.find.outputs.workspaces }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: find
@@ -43,7 +43,7 @@ jobs:
     env:
       WORKSPACE: ${{ matrix.workspace }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Validate
         run: docker run --rm -v "$PWD":/usr/local/structurizr "$STRUCTURIZR_IMAGE" validate -workspace "$WORKSPACE/workspace.dsl"
       - name: Inspect
@@ -61,14 +61,14 @@ jobs:
     env:
       WORKSPACE: ${{ matrix.workspace }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Export PNG, SVG and Mermaid
         run: |
           for format in png svg mermaid; do
             docker run --rm -v "$PWD":/usr/local/structurizr "$STRUCTURIZR_IMAGE" \
               export -workspace "$WORKSPACE/workspace.dsl" -format "$format" -output "diagrams/$WORKSPACE"
           done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: diagrams-${{ matrix.workspace }}
           path: diagrams/${{ matrix.workspace }}
