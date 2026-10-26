@@ -1,0 +1,74 @@
+name: Structurizr diagrams
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  # The -playwright tag carries the browser dependencies needed for PNG/SVG export.
+  STRUCTURIZR_IMAGE: structurizr/structurizr:2026.09.19-playwright
+
+jobs:
+  discover:
+    name: Find workspaces
+    runs-on: ubuntu-latest
+    outputs:
+      workspaces: ${{ steps.find.outputs.workspaces }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: find
+        env:
+          # Pull requests check everything. Pushes to main only look at what changed.
+          BASE: ${{ github.event_name == 'push' && github.event.before || '' }}
+        run: |
+          list=$(scripts/workspaces.sh "$BASE" "$GITHUB_SHA" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "workspaces=$list" | tee -a "$GITHUB_OUTPUT"
+
+  check:
+    name: Check ${{ matrix.workspace }}
+    needs: discover
+    if: needs.discover.outputs.workspaces != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace: ${{ fromJSON(needs.discover.outputs.workspaces) }}
+    # Folder names come from the pull request, so they go through env rather than into the script text.
+    env:
+      WORKSPACE: ${{ matrix.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate
+        run: docker run --rm -v "$PWD":/usr/local/structurizr "$STRUCTURIZR_IMAGE" validate -workspace "$WORKSPACE/workspace.dsl"
+      - name: Inspect
+        # The exit code is the number of violations shown, so any error or warning fails the job.
+        run: docker run --rm -v "$PWD":/usr/local/structurizr "$STRUCTURIZR_IMAGE" inspect -workspace "$WORKSPACE/workspace.dsl" -severity error,warning
+
+  export:
+    name: Export ${{ matrix.workspace }}
+    needs: [discover, check]
+    if: github.event_name == 'push' && needs.discover.outputs.workspaces != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace: ${{ fromJSON(needs.discover.outputs.workspaces) }}
+    env:
+      WORKSPACE: ${{ matrix.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export PNG, SVG and Mermaid
+        run: |
+          for format in png svg mermaid; do
+            docker run --rm -v "$PWD":/usr/local/structurizr "$STRUCTURIZR_IMAGE" \
+              export -workspace "$WORKSPACE/workspace.dsl" -format "$format" -output "diagrams/$WORKSPACE"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: diagrams-${{ matrix.workspace }}
+          path: diagrams/${{ matrix.workspace }}
