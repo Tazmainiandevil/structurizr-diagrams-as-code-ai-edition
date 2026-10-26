@@ -81,7 +81,7 @@ The old pipeline skipped pull requests. This one runs the checks on them, so a b
 
 Two pieces, both optional:
 
-**A skill.** [`.claude/skills/c4-diagram/SKILL.md`](.claude/skills/c4-diagram/SKILL.md) tells Claude Code how to work on a workspace: read the real code first, write the DSL, run `validate` and `inspect` until they are clean, then check the parts the tools cannot judge (one abstraction per thing, labels that match the arrow direction, people versus software).
+**A skill.** [`.claude/skills/c4-diagram/SKILL.md`](.claude/skills/c4-diagram/SKILL.md) tells Claude Code how to work on a workspace: read the real code first, run the checks on an existing file before changing it, write the DSL, run `validate` and `inspect` until they are clean, then check the parts the tools cannot judge (one abstraction per thing, labels that match the arrow direction, people versus software). Where a fact is not known, it leaves `TODO: confirm` and lists each one in its report.
 
 **The Structurizr MCP server.** It gives Claude `validate`, `inspect`, `parse` and the `export-*` tools directly. Start it, then open the repo in Claude Code, which reads [`.mcp.json`](.mcp.json):
 
@@ -93,7 +93,9 @@ Things worth knowing, all seen while writing the post:
 
 - Every tool takes the DSL as text. The server cannot read your repo, so Claude reads the file and passes it in.
 - The `validate` tool returns `isError: false` even when the DSL is broken. The error is in the text. Anything other than `OK` is a failure.
+- The `inspect` tool does the opposite: on DSL that does not parse it returns `isError: true`, with the same message.
 - The `inspect` tool also lists `IGNORE` entries. Those are the rules you suppressed, not failures.
+- `inspect` checks that a description or technology is present, not that it is true. Any text passes, including `TODO: confirm`, so a green build does not mean the facts are right. Search for `TODO: confirm` before you trust a workspace.
 - Run the server locally. The hosted `mcp.structurizr.com` instance would send your model to a third party, which matters for anything internal.
 
 ## Not covered
