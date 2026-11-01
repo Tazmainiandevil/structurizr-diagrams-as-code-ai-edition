@@ -1,6 +1,6 @@
 ---
 name: c4-diagram
-description: Use when creating or changing a Structurizr DSL workspace, or when asked to review a C4 diagram. Drafts the DSL, loops on validate and inspect until clean, then checks the c4model.com review checklist.
+description: Use when creating, changing or reviewing a C4 model architecture diagram (system context, container, component, deployment) written as a Structurizr DSL workspace. Drafts the DSL, loops on validate and inspect until clean, then checks the c4model.com review checklist.
 ---
 
 # C4 diagrams as Structurizr DSL
@@ -25,15 +25,17 @@ C4 suits bespoke software systems. It fits libraries, frameworks, SDKs, embedded
 
 ## Loop
 
-1. Read the code or docs the diagram describes. Every element and relationship must come from something you read. If you did not read it, leave it out, or follow "Facts you cannot verify" below.
+1. Read the code or docs the diagram describes. Every element and relationship must come from something you read or were told. If you did neither, leave it out, or follow "Facts you cannot verify" below.
 2. If `<folder>/workspace.dsl` already exists, run `validate` and `inspect` on it exactly as it is, before you change anything. Quote what they report. Do not correct a mistake by eye and then check the corrected text: the tool's message is the evidence that the check works, and it shows what was wrong.
 3. Write or edit `<folder>/workspace.dsl`.
-4. Validate and inspect. Use the Structurizr MCP tools `validate` and `inspect` if the `structurizr` MCP server is connected, otherwise run the CLI:
+4. Validate and inspect. Use the Structurizr MCP tools `validate` and `inspect` if the `structurizr` MCP server is connected, otherwise run the CLI. Take `IMAGE` from `STRUCTURIZR_IMAGE` in `.github/workflows/ci.yml` so the local check matches CI:
 
    ```bash
-   docker run --rm -v "$PWD":/usr/local/structurizr structurizr/structurizr:2026.09.19-playwright validate -workspace <folder>/workspace.dsl
-   docker run --rm -v "$PWD":/usr/local/structurizr structurizr/structurizr:2026.09.19-playwright inspect  -workspace <folder>/workspace.dsl -severity error,warning
+   docker run --rm -v "$PWD":/usr/local/structurizr "$IMAGE" validate -workspace <folder>/workspace.dsl
+   docker run --rm -v "$PWD":/usr/local/structurizr "$IMAGE" inspect  -workspace <folder>/workspace.dsl -severity error,warning
    ```
+
+   If neither the MCP server nor Docker is available, say the DSL is unchecked. Never describe it as clean.
 
 5. Repeat until `validate` prints nothing and `inspect` reports no `error` or `warning`.
 6. Run the checklist below. These are judgement calls the tools cannot make.
