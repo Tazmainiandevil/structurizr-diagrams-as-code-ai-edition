@@ -82,7 +82,7 @@ When you were not given a fact and cannot read it from the code, do not invent i
 
 ## Suppressing a rule
 
-Only suppress a rule when the rule is wrong for this workspace, never to get a green build. Put the reason next to it.
+Only suppress a rule when the rule is wrong for this workspace, never to get a green build. Put the reason next to it. Suppress a rule only after `inspect` has reported it. Never add suppressions in advance.
 
 The `documentation` and `decisions` rules ask for `!docs` and `!adrs` on a software system that has containers. If the project has documentation or decision records, attach them with `!docs <folder>` and `!adrs <folder>` inside the `softwareSystem` block. The path is relative to the DSL file. If it has none, suppress the rule on that software system only, not for the whole workspace, and list it as a gap in your final report. Do not write documentation or decisions to satisfy the rule.
 
