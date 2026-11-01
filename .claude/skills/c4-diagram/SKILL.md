@@ -76,11 +76,15 @@ Relationships
 
 `inspect` only checks that a description or technology is present, not that it is true. Any text satisfies it, so a green check says nothing about accuracy.
 
+Write descriptions and relationship verbs from the facts you were given and the names of the elements. "Exposes billing functionality as a REST API" follows from "a Go REST API for billing", so write it. Never fall back to "Uses": take the verb from the facts, for example "Works with billing data using". Reserve the placeholder for facts that are genuinely absent, such as a protocol, a version or a purpose nobody stated.
+
 When you were not given a fact and cannot read it from the code, do not invent it. Put the exact text `TODO: confirm` in the field, for example a container technology of `"TODO: confirm"`. In your final report, list every `TODO: confirm` you left and say what is needed to resolve it. Never present a workspace with placeholders as finished.
 
 ## Suppressing a rule
 
 Only suppress a rule when the rule is wrong for this workspace, never to get a green build. Put the reason next to it.
+
+The `documentation` and `decisions` rules ask for `!docs` and `!adrs` on a software system that has containers. If the project has documentation or decision records, attach them with `!docs <folder>` and `!adrs <folder>` inside the `softwareSystem` block. The path is relative to the DSL file. If it has none, suppress the rule on that software system only, not for the whole workspace, and list it as a gap in your final report. Do not write documentation or decisions to satisfy the rule.
 
 ```
 properties {
