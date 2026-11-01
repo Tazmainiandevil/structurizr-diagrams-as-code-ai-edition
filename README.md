@@ -83,6 +83,10 @@ Two pieces, both optional:
 
 **A skill.** [`.claude/skills/c4-diagram/SKILL.md`](.claude/skills/c4-diagram/SKILL.md) tells Claude Code how to work on a workspace: read the real code first, run the checks on an existing file before changing it, write the DSL, run `validate` and `inspect` until they are clean, then check the parts the tools cannot judge (one abstraction per thing, labels that match the arrow direction, people versus software). Where a fact is not known, it leaves `TODO: confirm` and lists each one in its report.
 
+It also decides which views to draw (system context and container by default; component, dynamic, deployment and landscape views only when they pay for themselves), and says so when C4 is a poor fit, such as for a library or SDK. [`reference.md`](.claude/skills/c4-diagram/reference.md) holds the modelling rules it follows: what counts as a container or component, how to model microservices by ownership, and queues and topics as containers. If a project has documentation or decision records it attaches them with `!docs` and `!adrs`. Otherwise it suppresses those two inspections on that system only and reports the gap. The rules come from [c4model.com](https://c4model.com/) and Simon Brown's book *The C4 model for visualising software architecture*.
+
+To use the skill in another repository, copy the whole `.claude/skills/c4-diagram/` folder (both files) into that repo's `.claude/skills/`. It expects one `workspace.dsl` per folder and reads the image tag from `.github/workflows/ci.yml`, so keep that layout or adjust the skill.
+
 **The Structurizr MCP server.** It gives Claude `validate`, `inspect`, `parse` and the `export-*` tools directly. Start it, then open the repo in Claude Code, which reads [`.mcp.json`](.mcp.json):
 
 ```bash
