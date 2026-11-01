@@ -1,6 +1,8 @@
 # C4 abstraction rules
 
-Source: c4model.com (github.com/simonbrowndotje/c4model) and Simon Brown, "The C4 model for visualising software architecture" (2025-11-19 edition). Read this before choosing what is a person, software system, container or component.
+Adapted from c4model.com by Simon Brown (github.com/simonbrowndotje/c4model), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Reworded and condensed. Further reading: *The C4 model for visualising software architecture*.
+
+Read this before choosing what is a person, software system, container or component.
 
 ## Software system
 
